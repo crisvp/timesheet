@@ -22,12 +22,12 @@ Analyze your work in detail:
 * `t today`
 * `t yesterday`
 * `t since 3 days ago`
-* `t week -1`
+* `t week 2 weeks ago`
 
 Customization
 -------------
 
-* The configuration files is in ~/.timesheetrc
-  * work week
-  * hours per week
-* The timesheet is a CSV format in `~/.timesheet`.
+* You can change the following in `~/.timesheetrc`
+  * Work week starting day
+  * Hours per week
+* The timesheet is a CSV file at `~/.timesheet`
