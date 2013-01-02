@@ -25,8 +25,10 @@ def print_usage(prog):
   print ''
   print 'REPORTING'
   print '  ' + prog + ' status\t\t\tcurrent period\'s time'
-  print '  ' + prog + ' week [backdate]\t\tbreakdown of this week by day'
-  print '  ' + prog + ' day [backdate]\t\tbreakdown of today\'s work'
+  print '  ' + prog + ' week [backdate]\t\tbreakdown of this or a previous week by day'
+  print '  ' + prog + ' today\t\t\tbreakdown of today\'s work'
+  print '  ' + prog + ' yesterday\t\t\tbreakdown of yesterday\'s work'
+  print '  ' + prog + ' day [backdate]\t\tbreakdown of a given day\'s work'
   print '  ' + prog + ' break\t\t\ttime since last period'
   print '  ' + prog + ' done\t\t\thours done this week'
   print '  ' + prog + ' left\t\t\thours left this week'
@@ -319,6 +321,20 @@ def main(argv):
       analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
     else:
       print 'coming soon!'
+
+  elif command == 'today':
+    # set the range sum up
+    period_start = util.interpretdate('today 00:00')
+    period_stop = datetime.today()
+
+    analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
+
+  elif command == 'yesterday':
+    # set the range sum up
+    period_start = util.interpretdate('yesterday 00:00')
+    period_stop = util.interpretdate('today 00:00')
+
+    analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
 
   elif command == 'break':
     print 'coming soon!'
