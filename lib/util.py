@@ -2,7 +2,24 @@
 
 from datetime import datetime
 from datetime import timedelta
+import time
 import subprocess
+
+# Get a datetime object with the start of the current work week.  day
+# is a string specifying the name of the day.  time is the 24-hour
+# time inside the starting day.
+def get_week_start(day, start_time):
+  weekday = time.strptime(day, '%A').tm_wday
+  start_time = datetime.strptime(start_time, '%H:%M').time()
+  start_day = datetime.today()
+  while start_day.weekday() != weekday:
+    start_day = start_day - timedelta(days=1)
+  return datetime(start_day.year, start_day.month, start_day.day, start_time.hour, start_time.minute, start_time.second)
+
+# Get a datetime object with the start of the current day, i.e. 00:00.
+def get_day_start():
+  today = datetime.today()
+  return datetime(today.year, today.month, today.day, 0, 0, 0)
 
 # Converts string to formatted date by calling out to the unix date
 # utility.  Returns None if conversion failed.
@@ -13,9 +30,10 @@ def interpretdate(string):
   stdout_, stderr_ = popen.communicate()
   if popen.returncode != 0:
     try:
-      __import__(dateutil)
-      return parser.parse(string)
+      return __import__('dateutil.parser').parser.parse(string)
     except ImportError:
+      return None
+    except NameError:
       return None
   else:
     return string2date(stdout_.strip())
