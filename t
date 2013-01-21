@@ -26,6 +26,7 @@ def print_usage(prog):
   print 'REPORTING'
   print '  ' + prog + ' status\t\t\tcurrent period\'s time'
   print '  ' + prog + ' week [backdate]\t\tbreakdown of this or a previous week by day'
+  print '  ' + prog + ' lastweek\t\t\tbreakdown of last week by day'
   print '  ' + prog + ' today\t\t\tbreakdown of today\'s work'
   print '  ' + prog + ' yesterday\t\t\tbreakdown of yesterday\'s work'
   print '  ' + prog + ' day [backdate]\t\tbreakdown of a given day\'s work'
@@ -55,6 +56,7 @@ def analyze(timesheet_log, timesheet_state, period_start, period_stop, breakdown
     entry_dur = min(entry_stop, period_stop) - max(entry_start, period_start)
     entry_message = row[2]
     entry_day = row[0].split(' ')[0]
+    entry_day = datetime.strptime(entry_day, '%Y/%m/%d').strftime('%a %Y/%m/%d')
     if entry_day != last_day:
       if last_day != None:
         if breakdown:
@@ -97,9 +99,10 @@ def analyze(timesheet_log, timesheet_state, period_start, period_stop, breakdown
 
 def create_config(config_path):
   config = ConfigParser.ConfigParser()
-  config.add_section('Parameters')
-  config.set('Parameters', 'week_start', 'Monday 9:00am')
-  config.set('Parameters', 'week_hours', '40')
+  config.add_section('Week')
+  config.set('Week', 'start_day', 'Monday')
+  config.set('Week', 'start_time', '09:00')
+  config.set('Week', 'hours', '40')
 
   config.add_section('Storage')
   config.set('Storage', 'timesheet', '~/.timesheet')
@@ -123,7 +126,8 @@ def main(argv):
     config_path = argv[argc]
     argc = argc + 1
 
-  week_start = None
+  start_day = None
+  start_time = None
   week_hours = None
   timesheet_logfile = None
   timesheet_statefile = None
@@ -138,8 +142,9 @@ def main(argv):
     config.read(config_path)
 
     try:
-      week_start = config.get('Parameters', 'week_start')
-      week_hours = int(config.get('Parameters', 'week_hours'))
+      start_day = config.get('Week', 'start_day')
+      start_time = config.get('Week', 'start_time')
+      week_hours = int(config.get('Week', 'hours'))
       timesheet_logfile = config.get('Storage', 'timesheet')
       timesheet_statefile = config.get('Storage', 'state')
       mbox_path = config.get('Importing', 'mbox')
@@ -302,7 +307,7 @@ def main(argv):
 
   elif command == 'week':
     # set the range sum up
-    period_start = util.interpretdate(week_start) - timedelta(days=6)
+    period_start = util.get_week_start(start_day, start_time)
     period_stop = datetime.today()
 
     if argument == '':
@@ -311,9 +316,16 @@ def main(argv):
     else:
       print 'coming soon!'
 
+  elif command == 'lastweek':
+    # set the range sum up
+    period_stop = util.get_week_start(start_day, start_time)
+    period_start = period_stop - timedelta(days=7)
+
+    analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
+
   elif command == 'day':
     # set the range sum up
-    period_start = util.interpretdate('today 00:00')
+    period_start = util.get_day_start()
     period_stop = datetime.today()
 
     if argument == '':
@@ -324,15 +336,15 @@ def main(argv):
 
   elif command == 'today':
     # set the range sum up
-    period_start = util.interpretdate('today 00:00')
+    period_start = util.get_day_start()
     period_stop = datetime.today()
 
     analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
 
   elif command == 'yesterday':
     # set the range sum up
-    period_start = util.interpretdate('yesterday 00:00')
-    period_stop = util.interpretdate('today 00:00')
+    period_start = util.get_day_start() - timedelta(days=1)
+    period_stop = util.get_day_start()
 
     analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
 
@@ -341,13 +353,13 @@ def main(argv):
 
   elif command == 'done':
      # set the range sum up
-     period_start = util.interpretdate(week_start) - timedelta(days=6)
+     period_start = util.get_week_start(start_day, start_time)
      period_stop = datetime.today()
      analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True, breakdown=False)
 
   elif command == 'left':
      # set the range sum up
-     period_start = util.interpretdate(week_start) - timedelta(days=6)
+     period_start = util.get_week_start(start_day, start_time)
      period_stop = datetime.today()
      analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True, breakdown=False, week_hours=week_hours, left=True)
 
