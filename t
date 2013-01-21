@@ -86,7 +86,7 @@ def analyze(timesheet_log, timesheet_state, period_start, period_stop, breakdown
       day_dur = period_stop - max(logged_time, period_start)
       dur += day_dur
       if breakdown:
-        print 'Current    ' + util.delta2string(day_dur)
+        print 'Current    ' + util.delta2string(day_dur) + ' ' + logged_message
         print ''
 
   if left:
@@ -247,8 +247,7 @@ def main(argv):
       print msg
       exit(1)
     timesheet_state.Clear()
-    print util.date2string(logged_time), util.date2string(stoptime),
-    entry_message
+    print util.date2string(logged_time), util.date2string(stoptime), entry_message
     print '\n', util.delta2string(stoptime - logged_time)
 
   elif command == 'message':
