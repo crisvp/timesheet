@@ -19,21 +19,23 @@ def print_usage(prog):
   print '  ' + prog + ' stop [-m msg] [backdate]\tstop timing'
   print '  ' + prog + ' message msg\t\t\tdescribe this period'
   print '  ' + prog + ' cancel\t\t\tcancel this period'
+  print '  ' + prog + ' status\t\t\tcurrent period\'s time'
+  print '  ' + prog + ' last\t\t\tthe last period\'s time'
+  print '  ' + prog + ' break\t\t\ttime since last period'
   print ''
   print '  [backdate] takes natural expressions like "3 hours ago" using GNU date'
   print '  [msg] is a string describing the time period'
   print ''
   print 'REPORTING'
-  print '  ' + prog + ' status\t\t\tcurrent period\'s time'
   print '  ' + prog + ' week [backdate]\t\tbreakdown of this or a previous week by day'
   print '  ' + prog + ' lastweek\t\t\tbreakdown of last week by day'
   print '  ' + prog + ' today\t\t\tbreakdown of today\'s work'
   print '  ' + prog + ' yesterday\t\t\tbreakdown of yesterday\'s work'
   print '  ' + prog + ' day [backdate]\t\tbreakdown of a given day\'s work'
-  print '  ' + prog + ' break\t\t\ttime since last period'
   print '  ' + prog + ' done\t\t\thours done this week'
   print '  ' + prog + ' left\t\t\thours left this week'
   print '  ' + prog + ' since [backdate]\t\twork done since a given date'
+  print '  ' + prog + ' between [backdate] and [backdate]\twork done between given dates'
   print ''
   print '  [backdate] takes natural expressions like "3 hours ago" using GNU date'
   print ''
@@ -43,6 +45,7 @@ def print_usage(prog):
   print '  ' + prog + ' week 2 weeks ago'
   print '  ' + prog + ' day yesterday'
   print '  ' + prog + ' since 3 days ago'
+  print '  ' + prog + ' between last week and yesterday'
 
 def analyze(timesheet_log, timesheet_state, period_start, period_stop, breakdown=True, current=False, week_hours=None, left=False):
   # sum the range
@@ -289,6 +292,11 @@ def main(argv):
     else:
       'aborted.  did not cancel the timer'
 
+  elif command == 'last':
+    last = timesheet_log.entries[-1]
+    print last[0], last[1], last[2]
+    print util.delta2string(util.string2date(last[1]) - util.string2date(last[0]))
+
   elif command == 'status':
     ret = timesheet_state.Get()
     if not ret:
@@ -305,15 +313,14 @@ def main(argv):
     importer.eternity(mbox_path)
 
   elif command == 'week':
-    # set the range sum up
-    period_start = util.get_week_start(start_day, start_time)
-    period_stop = datetime.today()
-
     if argument == '':
-      # Current week
+      period_start = util.get_week_start(start_day, start_time)
+      period_stop = datetime.today()
       analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
     else:
-      print 'coming soon!'
+      period_start = util.get_week_start(start_day, start_time, week=util.interpretdate(argument))
+      period_stop = period_start + timedelta(days=7)
+      analyze(timesheet_log, timesheet_state, period_start, period_stop)
 
   elif command == 'lastweek':
     # set the range sum up
@@ -323,15 +330,14 @@ def main(argv):
     analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
 
   elif command == 'day':
-    # set the range sum up
-    period_start = util.get_day_start()
-    period_stop = datetime.today()
-
     if argument == '':
-      # Current week
+      period_start = util.get_day_start()
+      period_stop = datetime.today()
       analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
     else:
-      print 'coming soon!'
+      period_start = util.get_day_start(day=util.interpretdate(argument))
+      period_stop = period_start + timedelta(days=1)
+      analyze(timesheet_log, timesheet_state, period_start, period_stop)
 
   elif command == 'today':
     # set the range sum up
@@ -348,7 +354,13 @@ def main(argv):
     analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
 
   elif command == 'break':
-    print 'coming soon!'
+    ret = timesheet_state.Get()
+    if ret:
+      print 'the timer is going'
+      return
+    else:
+      last = timesheet_log.entries[-1]
+      print util.delta2string(datetime.today() - util.string2date(last[1]))
 
   elif command == 'done':
      # set the range sum up
@@ -372,6 +384,9 @@ def main(argv):
 
       # Current week
       analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
+
+  elif command == 'since':
+    print 'coming soon!'
 
   else:
     print 'invalid command'
