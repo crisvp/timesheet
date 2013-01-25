@@ -352,7 +352,6 @@ def main(argv):
     period_stop = util.get_day_start()
 
     analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
-
   elif command == 'break':
     ret = timesheet_state.Get()
     if ret:
@@ -385,7 +384,7 @@ def main(argv):
       # Current week
       analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
 
-  elif command == 'since':
+  elif command == 'between':
     print 'coming soon!'
 
   else:
