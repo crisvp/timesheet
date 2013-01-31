@@ -322,6 +322,11 @@ def main(argv):
       period_stop = period_start + timedelta(days=7)
       analyze(timesheet_log, timesheet_state, period_start, period_stop)
 
+  elif command == 'thisweek':
+    period_start = util.get_week_start(start_day, start_time)
+    period_stop = datetime.today()
+    analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
+
   elif command == 'lastweek':
     # set the range sum up
     period_stop = util.get_week_start(start_day, start_time)
