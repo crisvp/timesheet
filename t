@@ -35,7 +35,7 @@ def print_usage(prog):
   print '  ' + prog + ' done\t\t\thours done this week'
   print '  ' + prog + ' left\t\t\thours left this week'
   print '  ' + prog + ' since [date]\t\twork done since a given date'
-  print '  ' + prog + ' between [date] and [date]\twork done between given dates'
+  print '  ' + prog + ' from [date] to [date]\twork done between given dates'
   print ''
   print '  [date] takes natural expressions like "3 hours ago" using GNU date'
   print ''
@@ -45,7 +45,7 @@ def print_usage(prog):
   print '  ' + prog + ' week 2 weeks ago'
   print '  ' + prog + ' day yesterday'
   print '  ' + prog + ' since 3 days ago'
-  print '  ' + prog + ' between last week and yesterday'
+  print '  ' + prog + ' from last thursday to yesterday'
 
 def analyze(timesheet_log, timesheet_state, period_start, period_stop, breakdown=True, current=False, week_hours=None, left=False):
   # sum the range
@@ -389,8 +389,20 @@ def main(argv):
       # Current week
       analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
 
-  elif command == 'between':
-    print 'coming soon!'
+  elif command == 'from':
+    if argument == '':
+      print 'please specify a date range'
+    else:
+      # get the two dates separated by 'and'
+      date_range = argument.split(' to ')
+      assert len(date_range) == 2
+
+      # set the range sum up
+      period_start = util.interpretdate(date_range[0])
+      period_stop = util.interpretdate(date_range[1])
+
+      # Current week
+      analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
 
   else:
     print 'invalid command'
