@@ -58,7 +58,7 @@ def analyze(timesheet_log, timesheet_state, period_start, period_stop, breakdown
     entry_stop = util.string2date(row[1])
     entry_dur = min(entry_stop, period_stop) - max(entry_start, period_start)
     entry_message = row[2]
-    entry_day = row[0].split(' ')[0]
+    entry_day = util.date2string(max(entry_start, period_start)).split(' ')[0]
     entry_day = datetime.strptime(entry_day, '%Y/%m/%d').strftime('%a %Y/%m/%d')
     if entry_day != last_day:
       if last_day != None:
