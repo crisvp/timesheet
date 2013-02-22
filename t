@@ -23,8 +23,8 @@ def print_usage(prog):
   print '  ' + prog + ' last\t\t\tthe last period\'s time'
   print '  ' + prog + ' break\t\t\ttime since last period'
   print ''
-  print '  [date] takes natural expressions like "3 hours ago" using GNU date'
-  print '  [msg] is a string describing the time period'
+  print '  "date" takes natural expressions like "3 hours ago" using GNU date'
+  print '  "msg" is a string describing the time period'
   print ''
   print 'REPORTING'
   print '  ' + prog + ' week [date]\t\t\tbreakdown of this or a previous week by day'
@@ -34,10 +34,9 @@ def print_usage(prog):
   print '  ' + prog + ' day [date]\t\t\tbreakdown of a given day\'s work'
   print '  ' + prog + ' done\t\t\thours done this week'
   print '  ' + prog + ' left\t\t\thours left this week'
-  print '  ' + prog + ' since [date]\t\twork done since a given date'
-  print '  ' + prog + ' from [date] to [date]\twork done between given dates'
+  print '  ' + prog + ' since date [to date]\t\twork done since or between given dates'
   print ''
-  print '  [date] takes natural expressions like "3 hours ago" using GNU date'
+  print '  "date" takes natural expressions like "3 hours ago" using GNU date'
   print ''
   print 'EXAMPLES OF NATURAL DATE EXPRESSIONS'
   print '  ' + prog + ' start 5 minutes ago'
@@ -382,27 +381,24 @@ def main(argv):
     if argument == '':
       print 'please specify a date'
     else:
-      # set the range sum up
-      period_start = util.interpretdate(argument)
-      period_stop = datetime.today()
-
-      # Current week
-      analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
-
-  elif command == 'from':
-    if argument == '':
-      print 'please specify a date range'
-    else:
-      # get the two dates separated by 'and'
       date_range = argument.split(' to ')
-      assert len(date_range) == 2
+      if len(date_range) == 1:
+        # set the range sum up
+        period_start = util.interpretdate(argument)
+        period_stop = datetime.today()
 
-      # set the range sum up
-      period_start = util.interpretdate(date_range[0])
-      period_stop = util.interpretdate(date_range[1])
+        # Current week
+        analyze(timesheet_log, timesheet_state, period_start, period_stop, current=True)
+      elif len(date_range) == 2:
+        # set the range sum up
+        period_start = util.interpretdate(date_range[0])
+        period_stop = util.interpretdate(date_range[1])
 
-      # Current week
-      analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
+        # Current week
+        analyze(timesheet_log, timesheet_state, period_start, period_stop, current=False)
+      else:
+        print "invalid syntax"
+        exit(1)
 
   else:
     print 'invalid command'
