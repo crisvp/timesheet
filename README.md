@@ -32,3 +32,9 @@ Customization
   * Work week starting day
   * Hours per week
 * The timesheet is a CSV file at `~/.timesheet`
+
+Fork
+----
+
+This fork of [timesheet](https://github.com/paulgazz/timesheet)
+uses python3.6, pipenv, and pyinstaller. The rest is the same.
