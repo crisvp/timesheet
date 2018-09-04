@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 dateparser = "*"
-pyinstaller = "*"
 
 [dev-packages]
 flake8 = "*"
+pyinstaller = "*"
 
 [requires]
 python_version = "3.6"
