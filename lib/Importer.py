@@ -3,14 +3,11 @@
 # Extract the iOS app's Eternity timer's csv's from a local mailbox in
 # mbox format.  Use fetchmail to get the mail locally.
 
-import os
-import sys
 from . import util
 import mailbox
 import csv
 import io
 
-from datetime import datetime
 from datetime import timedelta
 
 
@@ -65,7 +62,6 @@ class Importer(object):
                                             imported += 1
                                         else:
                                             print(msg)
-                 # mbox.remove(key)
         finally:
             mbox.flush()
             mbox.close()

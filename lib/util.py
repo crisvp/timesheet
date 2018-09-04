@@ -4,7 +4,6 @@ from datetime import datetime
 from datetime import timedelta
 import dateparser
 import time
-import subprocess
 
 # Get a datetime object with the start of the current work week.  day
 # is a string specifying the name of the day.  time is the 24-hour
