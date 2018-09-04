@@ -8,8 +8,8 @@ Start timing with `t start`.  Stop with `t stop`.
 Set a message anytime with `t message` or when stopping the timer. 
 Cancel timing with `t cancel`.
 Check on the current timer with `t status` and get a break-down of the week with `t week`.
-If you forget to start or stop the timer, backdate like this: `t start 10 minutes ago`.  We use GNU's `date` to
-parse [time expressions](http://www.gnu.org/software/coreutils/manual/coreutils.html#Date-input-formats).
+If you forget to start or stop the timer, backdate like this: `t start 10 minutes ago`.  We use dateparser to
+parse [time expressions](https://dateparser.readthedocs.io/en/latest/#dateparser.parse).
 
 Advanced Usage
 --------------
