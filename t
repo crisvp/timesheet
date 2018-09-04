@@ -63,6 +63,7 @@ def analyze(
     string_start = util.date2string(period_start)
     string_stop = util.date2string(period_stop)
     dur = timedelta(0)
+    day_dur = timedelta(0)
     last_day = None
     for row in [x for x in timesheet_log.entries if x[0] <=
                 string_stop and x[1] >= string_start]:
@@ -172,10 +173,10 @@ def main(argv):
             timesheet_statefile = config.get('Storage', 'state')
             mbox_path = config.get('Importing', 'mbox')
             success = True
-        except configparser.NoOptionError as err:
+        except configparser.NoOptionError:
             print('There is an option missing in the configuration file.')
             create_config(config_path)
-        except configparser.NoSectionError as err:
+        except configparser.NoSectionError:
             print('There is an option missing in the configuration file.')
             create_config(config_path)
 
