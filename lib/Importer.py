@@ -5,10 +5,10 @@
 
 import os
 import sys
-import util
+from . import util
 import mailbox
 import csv
-import StringIO
+import io
 
 from datetime import datetime
 from datetime import timedelta
@@ -19,9 +19,9 @@ class Importer(object):
         self.timesheet_log = timesheet_log
 
     def eternity(self, mbox_file):
-        print 'importing app\'s csv timesheets from mailbox'
-        print 'mailbox: ' + mbox_file
-        print ''
+        print('importing app\'s csv timesheets from mailbox')
+        print(('mailbox: ' + mbox_file))
+        print('')
 
         # open and lock the mailbox
         mbox = mailbox.mbox(mbox_file, create=False)
@@ -29,17 +29,17 @@ class Importer(object):
 
         imported = 0
         try:
-            for key, msg in mbox.iteritems():
+            for key, msg in list(mbox.items()):
                 if msg['subject'].startswith('Eternity'):
                     for part in msg.walk(
                     ):  # assume its multipart by its subject
                         if part.get_content_type() == 'text/csv' and '_logs_' in part.get_filename():
-                            sio = StringIO.StringIO(part.get_payload())
+                            sio = io.StringIO(part.get_payload())
                             reader = csv.reader(sio, delimiter=',')
                             for f in reader:
                                 if not f[0] == 'day':
                                     if len(f) >= 8:
-                                        print "importing " + str(f)
+                                        print(("importing " + str(f)))
                                         startdate = util.string2date(
                                             f[0] + ' ' + f[1])
                                         d = f[3].split(':')
@@ -60,11 +60,11 @@ class Importer(object):
                                         added, msg = self.timesheet_log.AddEntry(
                                             startdate, enddate, message)
                                         if added:
-                                            print "added entry: " + util.date2string(startdate), util.date2string(enddate), message
-                                            print ""
+                                            print(("added entry: " + util.date2string(startdate), util.date2string(enddate), message))
+                                            print("")
                                             imported += 1
                                         else:
-                                            print msg
+                                            print(msg)
                  # mbox.remove(key)
         finally:
             mbox.flush()
@@ -72,6 +72,6 @@ class Importer(object):
             mbox.unlock()
 
         if imported == 0:
-            print "nothing to import"
+            print("nothing to import")
         else:
-            print "imported " + str(imported) + " entries"
+            print(("imported " + str(imported) + " entries"))

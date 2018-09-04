@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from datetime import datetime
-import util
+from . import util
 import os
 import csv
 import operator
@@ -20,7 +20,7 @@ class TimesheetCSV(object):
         if self._entries is None:
             if os.path.exists(self.filename):
                 needs_sorting = False
-                with open(self.filename, 'rb') as fh:
+                with open(self.filename, 'r') as fh:
                     reader = csv.reader(fh, delimiter=',')
                     self._entries = list(reader)
 
@@ -40,7 +40,7 @@ class TimesheetCSV(object):
                     # TODO verbose output
                     self._entries = sorted(
                         self._entries, key=operator.itemgetter(0))
-                    with open(self.filename, 'wb+') as fh:
+                    with open(self.filename, 'w+') as fh:
                         writer = csv.writer(
                             fh, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                         for row in self._entries:
@@ -72,7 +72,7 @@ class TimesheetCSV(object):
             if new_hash == item_hash:
                 return False, "duplicate entry"
 
-        with open(self.filename, 'ab+') as csvfile:
+        with open(self.filename, 'a+') as csvfile:
             writer = csv.writer(
                 csvfile,
                 delimiter=',',

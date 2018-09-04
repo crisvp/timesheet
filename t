@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
-import ConfigParser
+import configparser
 from datetime import datetime
 from datetime import timedelta
 
@@ -13,39 +13,41 @@ from lib.Importer import Importer
 
 
 def print_usage(prog):
-    print 'Welcome to timesheet!'
-    print ''
-    print 'TIMER USAGE'
-    print '  ' + prog + ' start [-m msg] [date]\tstart timing'
-    print '  ' + prog + ' stop [-m msg] [date]\tstop timing'
-    print '  ' + prog + ' message msg\t\t\tdescribe this period'
-    print '  ' + prog + ' cancel\t\t\tcancel this period'
-    print '  ' + prog + ' status\t\t\tcurrent period\'s time'
-    print '  ' + prog + ' last\t\t\tthe last period\'s time'
-    print '  ' + prog + ' break\t\t\ttime since last period'
-    print ''
-    print '  "date" takes natural expressions like "3 hours ago" using GNU date'
-    print '  "msg" is a string describing the time period'
-    print ''
-    print 'REPORTING'
-    print '  ' + prog + ' week [date]\t\t\tbreakdown of this or a previous week by day'
-    print '  ' + prog + ' lastweek\t\t\tbreakdown of last week by day'
-    print '  ' + prog + ' today\t\t\tbreakdown of today\'s work'
-    print '  ' + prog + ' yesterday\t\t\tbreakdown of yesterday\'s work'
-    print '  ' + prog + ' day [date]\t\t\tbreakdown of a given day\'s work'
-    print '  ' + prog + ' done\t\t\thours done this week'
-    print '  ' + prog + ' left\t\t\thours left this week'
-    print '  ' + prog + ' since date [to date]\t\twork done since or between given dates'
-    print ''
-    print '  "date" takes natural expressions like "3 hours ago" using GNU date'
-    print ''
-    print 'EXAMPLES OF NATURAL DATE EXPRESSIONS'
-    print '  ' + prog + ' start 5 minutes ago'
-    print '  ' + prog + ' stop yesterday 3:25pm'
-    print '  ' + prog + ' week 2 weeks ago'
-    print '  ' + prog + ' day yesterday'
-    print '  ' + prog + ' since 3 days ago'
-    print '  ' + prog + ' from last thursday to yesterday'
+    print('''
+Welcome to timesheet!
+
+TIMER USAGE
+    {prog} start [-m msg] [date]     start timing
+    {prog} stop [-m msg] [date]      stop timing
+    {prog} message msg               describe this period
+    {prog} cancel                    cancel this period
+    {prog} status                    current period's time
+    {prog} lastt                     the last period's time
+    {prog} break                     time since last period
+
+       "date" takes natural expressions like "3 hours ago" using dateparser
+       "msg" is a string describing the time period
+
+REPORTING
+    {prog} week [date]               breakdown of this or a previous week by day
+    {prog} lastweek                  breakdown of last week by day
+    {prog} today                     breakdown of today's work
+    {prog} yesterday                 breakdown of yesterday's work
+    {prog} day [date]                breakdown of a given day's work
+    {prog} done                      hours done this week
+    {prog} left                      hours left this week
+    {prog} since date [to date]      work done since or between given dates
+
+       "date" takes natural expressions like "3 hours ago" using dateparser
+
+EXAMPLES OF NATURAL DATE EXPRESSIONS
+    {prog} start 5 minutes ago
+    {prog} stop yesterday 3:25pm
+    {prog} week 2 weeks ago
+    {prog} day yesterday
+    {prog} since 3 days ago
+    {prog} from last thursday to yesterday'''
+          .format(prog=prog))
 
 
 def analyze(
@@ -76,8 +78,8 @@ def analyze(
         if entry_day != last_day:
             if last_day is not None:
                 if breakdown:
-                    print ' ' * len(entry_day) + ' Total ' + util.delta2string(day_dur, decimal=True, abbr=True)
-                    print ''
+                    print(' ' * len(entry_day) + ' Total ' + util.delta2string(day_dur, decimal=True, abbr=True))
+                    print('')
             display_day = entry_day
             day_dur = timedelta(0)
         else:
@@ -88,11 +90,11 @@ def analyze(
         dur += entry_dur
         day_dur += entry_dur
         if breakdown:
-            print display_day, util.delta2string(entry_dur, show_days=True, decimal=True, abbr=True) + '\t' + entry_message
+            print(display_day, util.delta2string(entry_dur, show_days=True, decimal=True, abbr=True) + '\t' + entry_message)
     if last_day is not None:
         if breakdown:
-            print ' ' * len(entry_day) + ' Total ' + util.delta2string(day_dur, decimal=True, abbr=True)
-            print ''
+            print(' ' * len(entry_day) + ' Total ' + util.delta2string(day_dur, decimal=True, abbr=True))
+            print('')
 
     if current:
         # add the current timer if applicable
@@ -102,8 +104,8 @@ def analyze(
             day_dur = period_stop - max(logged_time, period_start)
             dur += day_dur
             if breakdown:
-                print 'Current    ' + util.delta2string(day_dur) + ' ' + logged_message
-                print ''
+                print('Current    ' + util.delta2string(day_dur) + ' ' + logged_message)
+                print('')
 
     if left:
         time_left = max(
@@ -112,13 +114,13 @@ def analyze(
             timedelta(0),
             timedelta(0))
         time_left = util.delta2string(time_left)
-        print time_left, 'left'
+        print(time_left, 'left')
     else:
-        print util.delta2string(dur)
+        print(util.delta2string(dur))
 
 
 def create_config(config_path):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.add_section('Week')
     config.set('Week', 'start_day', 'Monday')
     config.set('Week', 'start_time', '09:00')
@@ -133,7 +135,7 @@ def create_config(config_path):
 
     with open(config_path, 'wb+') as configfile:
         config.write(configfile)
-    print 'I have created the configuration file ' + config_path + '.\n'
+    print('I have created the configuration file ' + config_path + '.\n')
 
 
 def main(argv):
@@ -159,7 +161,7 @@ def main(argv):
     success = False
     while try_config < 3 and not success:
         try_config += 1
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(config_path)
 
         try:
@@ -170,11 +172,11 @@ def main(argv):
             timesheet_statefile = config.get('Storage', 'state')
             mbox_path = config.get('Importing', 'mbox')
             success = True
-        except ConfigParser.NoOptionError as err:
-            print 'There is an option missing in the configuration file.'
+        except configparser.NoOptionError as err:
+            print('There is an option missing in the configuration file.')
             create_config(config_path)
-        except ConfigParser.NoSectionError as err:
-            print 'There is an option missing in the configuration file.'
+        except configparser.NoSectionError as err:
+            print('There is an option missing in the configuration file.')
             create_config(config_path)
 
     # get the timesheet command and its arguments
@@ -190,7 +192,7 @@ def main(argv):
     command_message = ''
     if len(args) > 0 and command in ['start', 'stop'] and args[0] == '-m':
         if len(args) == 1:
-            print '-m must take a message as a parameter'
+            print('-m must take a message as a parameter')
             return
         else:
             command_message = args[1]
@@ -210,49 +212,48 @@ def main(argv):
             # backdate the timer
             starttime = util.interpretdate(argument)
             if starttime is None:
-                print 'invalid date. try again.'
+                print('invalid date. try again.')
                 return
         else:
             starttime = datetime.today()
 
         if ret:
             # stop the old timer first
-            yn = raw_input(
+            yn = input(
                 'the timer is already going.  start a new one? [Y/n] ')
             if yn.lower() == 'n':
-                print 'aborted.  did not cancel the timer'
+                print('aborted.  did not cancel the timer')
                 return
-            print 'stopping old timer'
+            print('stopping old timer')
             stoptime = starttime
             logged_time, logged_message = ret
             while logged_message == '':
-                logged_message = raw_input('please enter a message: ')
+                logged_message = input('please enter a message: ')
             added, msg = timesheet_log.AddEntry(
                 logged_time, stoptime, logged_message)
             if not added:
-                print msg
+                print(msg)
                 exit(1)
             timesheet_state.Clear()
-            print util.date2string(logged_time), util.date2string(stoptime),
-            logged_message
-            print '\n', util.delta2string(stoptime - logged_time), '\n'
+            print('{} - {} ({}): {}'.format(util.date2string(logged_time), util.date2string(stoptime),
+                                            util.delta2string(stoptime - logged_time), logged_message))
 
         timesheet_state.Set(starttime, command_message)
-        print 'started timing'
+        print('started timing')
         if command_message != '':
-            print 'message set'
+            print('message set')
 
     elif command == 'stop':
         ret = timesheet_state.Get()
         if not ret:
-            print 'cannot stop what has not been started.'
+            print('cannot stop what has not been started.')
             return
 
         if argument != '':
             # backdate the timer
             stoptime = util.interpretdate(argument)
             if stoptime is None:
-                print 'invalid date. try again.'
+                print('invalid date. try again.')
                 return
         else:
             stoptime = datetime.today()
@@ -263,71 +264,71 @@ def main(argv):
             entry_message = command_message
         else:
             while logged_message == '':
-                logged_message = raw_input('please enter a message: ')
+                logged_message = input('please enter a message: ')
             entry_message = logged_message
         added, msg = timesheet_log.AddEntry(
             logged_time, stoptime, entry_message)
         if not added:
-            print msg
+            print(msg)
             exit(1)
         timesheet_state.Clear()
-        print util.date2string(logged_time), util.date2string(stoptime), entry_message
-        print '\n', util.delta2string(stoptime - logged_time)
+        print(util.date2string(logged_time), util.date2string(stoptime), entry_message)
+        print('\n', util.delta2string(stoptime - logged_time))
 
     elif command == 'message':
         ret = timesheet_state.Get()
         if not ret:
-            print 'the timer is not going'
+            print('the timer is not going')
             return
 
         logged_time, logged_message = ret
         if logged_message != '':
-            print 'the message is already set'
-            yn = raw_input('do you want to change the message? [y/N] ')
+            print('the message is already set')
+            yn = input('do you want to change the message? [y/N] ')
             if yn.lower() != 'y':
-                print 'okay.  leaving the existing message alone'
+                print('okay.  leaving the existing message alone')
                 return
             logged_message = ''
         if argument != '':
             entry_message = argument
         else:
             while logged_message == '':
-                logged_message = raw_input('please enter a message: ')
+                logged_message = input('please enter a message: ')
             entry_message = logged_message
         timesheet_state.Set(logged_time, entry_message)
-        print 'message set'
+        print('message set')
 
     elif command == 'cancel':
         ret = timesheet_state.Get()
         if not ret:
-            print 'cannot stop what has not been started.'
+            print('cannot stop what has not been started.')
             return
 
         logged_time, logged_message = ret
-        print 'started', util.date2string(logged_time)
+        print('started', util.date2string(logged_time))
 
-        yn = raw_input('are you sure you want to cancel the entry? [y/N] ')
+        yn = input('are you sure you want to cancel the entry? [y/N] ')
         if yn.lower() == 'y':
             timesheet_state.Clear()
-            print 'cancelled timer'
+            print('cancelled timer')
         else:
             'aborted.  did not cancel the timer'
 
     elif command == 'last':
         last = timesheet_log.entries[-1]
-        print last[0], last[1], last[2]
-        print util.delta2string(util.string2date(last[1]) - util.string2date(last[0]))
+        print(last[0], last[1], last[2])
+        print(util.delta2string(util.string2date(last[1]) - util.string2date(last[0])))
 
     elif command == 'status':
         ret = timesheet_state.Get()
         if not ret:
-            print 'the timer is not going'
+            print('the timer is not going')
             return
 
         logged_time, logged_message = ret
         stop_time = datetime.today()
-        print util.delta2string(stop_time - logged_time), logged_message
-        print 'started at', util.date2string(logged_time)
+        print(util.delta2string(stop_time - logged_time), logged_message)
+        print('started at', util.date2string(logged_time))
 
     elif command == 'import':
         importer = Importer(timesheet_log)
@@ -412,11 +413,11 @@ def main(argv):
     elif command == 'break':
         ret = timesheet_state.Get()
         if ret:
-            print 'the timer is going'
+            print('the timer is going')
             return
         else:
             last = timesheet_log.entries[-1]
-            print util.delta2string(datetime.today() - util.string2date(last[1]))
+            print(util.delta2string(datetime.today() - util.string2date(last[1])))
 
     elif command == 'done':
         # set the range sum up
@@ -446,7 +447,7 @@ def main(argv):
 
     elif command == 'since':
         if argument == '':
-            print 'please specify a date'
+            print('please specify a date')
         else:
             date_range = argument.split(' to ')
             if len(date_range) == 1:
@@ -474,11 +475,11 @@ def main(argv):
                     period_stop,
                     current=False)
             else:
-                print "invalid syntax"
+                print("invalid syntax")
                 exit(1)
 
     else:
-        print 'invalid command'
+        print('invalid command')
         return
 
 
