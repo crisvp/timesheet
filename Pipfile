@@ -5,9 +5,9 @@ name = "pypi"
 
 [packages]
 dateparser = "*"
+pyinstaller = "*"
 
 [dev-packages]
-pyinstaller = "*"
 flake8 = "*"
 
 [requires]
