@@ -22,7 +22,7 @@ TIMER USAGE
     {prog} message msg               describe this period
     {prog} cancel                    cancel this period
     {prog} status                    current period's time
-    {prog} lastt                     the last period's time
+    {prog} last                      the last period's time
     {prog} break                     time since last period
 
        "date" takes natural expressions like "3 hours ago" using dateparser
