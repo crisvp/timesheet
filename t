@@ -3,13 +3,14 @@
 import os
 import sys
 import configparser
+from io import StringIO
 from datetime import datetime
 from datetime import timedelta
 
 import lib.util as util
 from lib.TimesheetCSV import TimesheetCSV
 from lib.TimesheetState import TimesheetState
-from lib.Importer import Importer
+from lib.EternityImporter import EternityImporter
 
 
 def print_usage(prog):
@@ -120,25 +121,6 @@ def analyze(
         print(util.delta2string(dur))
 
 
-def create_config(config_path):
-    config = configparser.ConfigParser()
-    config.add_section('Week')
-    config.set('Week', 'start_day', 'Monday')
-    config.set('Week', 'start_time', '09:00')
-    config.set('Week', 'hours', '40')
-
-    config.add_section('Storage')
-    config.set('Storage', 'timesheet', '~/.timesheet')
-    config.set('Storage', 'state', '~/.timesheet.state')
-
-    config.add_section('Importing')
-    config.set('Importing', 'mbox', '~/.mail/incoming')
-
-    with open(config_path, 'wb+') as configfile:
-        config.write(configfile)
-    print('I have created the configuration file ' + config_path + '.\n')
-
-
 def main(argv):
     prog = os.path.basename(argv[0])  # program name as called
     argc = 1  # i like C
@@ -156,29 +138,36 @@ def main(argv):
     timesheet_logfile = None
     timesheet_statefile = None
     mbox_path = None
-    if not os.path.exists(config_path):
-        create_config(config_path)
-    try_config = 0
-    success = False
-    while try_config < 3 and not success:
-        try_config += 1
-        config = configparser.ConfigParser()
-        config.read(config_path)
+    defaultconfig = '''
+[Week]
+start_day = Monday
+start_time = 09:00
+hours = 40
 
-        try:
-            start_day = config.get('Week', 'start_day')
-            start_time = config.get('Week', 'start_time')
-            week_hours = int(config.get('Week', 'hours'))
-            timesheet_logfile = config.get('Storage', 'timesheet')
-            timesheet_statefile = config.get('Storage', 'state')
-            mbox_path = config.get('Importing', 'mbox')
-            success = True
-        except configparser.NoOptionError:
-            print('There is an option missing in the configuration file.')
-            create_config(config_path)
-        except configparser.NoSectionError:
-            print('There is an option missing in the configuration file.')
-            create_config(config_path)
+[Storage]
+timesheet = ~/.timesheet
+state = ~/.timesheet.state
+
+[EternityMail]
+mbox = ~/.mail/incoming
+'''
+
+    config = configparser.ConfigParser()
+    defaultbuf = StringIO(defaultconfig)
+    config.readfp(defaultbuf)
+    if os.path.exists(config_path):
+        config.read(config_path)
+    else:
+        with open(config_path, 'w') as configfile:
+            config.write(configfile)
+        print('I have created the configuration file ' + config_path + '.\n')
+
+    start_day = config.get('Week', 'start_day')
+    start_time = config.get('Week', 'start_time')
+    week_hours = int(config.get('Week', 'hours'))
+    timesheet_logfile = config.get('Storage', 'timesheet')
+    timesheet_statefile = config.get('Storage', 'state')
+    mbox_path = config.get('EternityMail', 'mbox')
 
     # get the timesheet command and its arguments
     if argc >= len(argv):
@@ -332,7 +321,7 @@ def main(argv):
         print('started at', util.date2string(logged_time))
 
     elif command == 'import':
-        importer = Importer(timesheet_log)
+        importer = EternityImporter(timesheet_log)
         importer.eternity(mbox_path)
 
     elif command == 'week':

@@ -11,7 +11,7 @@ import io
 from datetime import timedelta
 
 
-class Importer(object):
+class EternityImporter(object):
     def __init__(self, timesheet_log):
         self.timesheet_log = timesheet_log
 
