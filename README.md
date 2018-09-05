@@ -37,4 +37,5 @@ Fork
 ----
 
 This fork of [timesheet](https://github.com/paulgazz/timesheet)
-uses python3.6, pipenv, and pyinstaller. The rest is the same.
+uses python3.6, pipenv, dateparser instead of GNU date, and
+pyinstaller. The rest is the same.
