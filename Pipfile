@@ -8,7 +8,7 @@ dateparser = "*"
 
 [dev-packages]
 flake8 = "*"
-pyinstaller = "*"
+pyinstaller = {editable = true, ref = "a4d6fea5e766480515c3b8305d6c6cd5db842319", git = "https://github.com/pyinstaller/pyinstaller.git"}
 
 [requires]
 python_version = "3.6"

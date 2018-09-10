@@ -4,6 +4,6 @@ strptime_data_file = exec_statement(
     "import inspect; import _strptime; print(inspect.getfile(_strptime))"
 )
 
-datas = [(strptime_data_file, "")]
+datas = [(strptime_data_file, ".")]
 
 hiddenimports = collect_submodules('dateparser')

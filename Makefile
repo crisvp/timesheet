@@ -1,10 +1,10 @@
 PREFIX=$(HOME)
-PYINSTALLER=pyinstaller
+PYINSTALLER=pipenv run pyinstaller
 
 all: dist/t
 
 dist/t:
-	$(PYINSTALLER) --hidden-import _strptime --additional-hooks-dir hooks -F t
+	$(PYINSTALLER) --hidden-import _strptime --additional-hooks-dir hooks -F t.spec
 
 install: dist/t
 	install -d $(PREFIX)/bin
